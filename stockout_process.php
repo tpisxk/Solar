@@ -1,0 +1,57 @@
+<?php
+require_once 'conn.php';
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $product_id     = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+    $quantity       = isset($_POST['quantity']) ? intval($_POST['quantity']) : 0;
+    $installation_id = !empty($_POST['installation_id']) ? intval($_POST['installation_id']) : null;
+    $note           = isset($_POST['note']) ? trim($_POST['note']) : '';
+    $employee_id    = isset($_SESSION['employee_id']) ? intval($_SESSION['employee_id']) : 1;
+
+    if ($product_id <= 0 || $quantity <= 0) {
+        header("Location: stockout.php?status=error");
+        exit();
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. ตรวจสอบสต็อกปัจจุบัน
+        $stmt_check = $pdo->prepare("SELECT stock_quantity FROM products WHERE id = ? FOR UPDATE");
+        $stmt_check->execute([$product_id]);
+        $product = $stmt_check->fetch(PDO::FETCH_ASSOC);
+
+        if (!$product || intval($product['stock_quantity']) < $quantity) {
+            $pdo->rollBack();
+            header("Location: stockout.php?status=insufficient");
+            exit();
+        }
+
+        $new_stock = intval($product['stock_quantity']) - $quantity;
+
+        // 2. ตัดสต็อกสินค้า
+        $stmt_update = $pdo->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
+        $stmt_update->execute([$new_stock, $product_id]);
+
+        // 3. บันทึกประวัติการเบิกออก (พร้อมระบุ installation_id เพื่อเชื่อมกับโครงการ)
+        $stmt_insert = $pdo->prepare("
+            INSERT INTO stock_transactions (product_id, installation_id, type, quantity, reference_no, employee_id, note, created_at) 
+            VALUES (?, ?, 'out', ?, '', ?, ?, NOW())
+        ");
+        $stmt_insert->execute([$product_id, $installation_id, $quantity, $employee_id, $note]);
+
+        $pdo->commit();
+        header("Location: stockout.php?status=success");
+        exit();
+
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        header("Location: stockout.php?status=error");
+        exit();
+    }
+} else {
+    header("Location: stockout.php");
+    exit();
+}
+?>
