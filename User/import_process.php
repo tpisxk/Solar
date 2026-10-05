@@ -53,12 +53,12 @@ if (isset($_POST['import_submit'])) {
             }
             fclose($handle);
 
-            header("Location: inventory.php?import=success&count=" . $successCount);
+            header("Location: User/inventory.php?import=success&count=" . $successCount);
             exit();
         }
     }
 }
 
-header("Location: inventory.php?import=error");
+header("Location: User/inventory.php?import=error");
 exit();
 ?>

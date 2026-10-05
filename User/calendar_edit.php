@@ -41,5 +41,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // หากเข้ามาโดยไม่มีการส่งข้อมูล POST หรือข้อมูลไม่ครบ
-header("Location: calendar.php?month={$redirect_month}&year={$redirect_year}");
+header("Location: User/calendar.php?month={$redirect_month}&year={$redirect_year}");
 exit();

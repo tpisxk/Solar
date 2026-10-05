@@ -1,6 +1,6 @@
 <?php
 require_once 'conn.php';
-$current_page = 'stockout'; // กำหนดหน้าปัจจุบันสำหรับ Sidebar
+$current_page = 'User/stockout'; // กำหนดหน้าปัจจุบันสำหรับ Sidebar
 
 // 1. ดึงยอดรวมจำนวนสินค้าทั้งหมดในคลัง สำหรับแสดงที่ Sidebar (ใช้ stock_quantity)
 try {

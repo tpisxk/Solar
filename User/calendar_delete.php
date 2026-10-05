@@ -23,5 +23,5 @@ if (isset($_GET['delete_id'])) {
 }
 
 // หากไม่มีการส่ง ID มา ให้กลับหน้าปฏิทินปกติ
-header("Location: calendar.php?month={$month}&year={$year}");
+header("Location: User/calendar.php?month={$month}&year={$year}");
 exit();

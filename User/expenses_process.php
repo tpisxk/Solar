@@ -20,17 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$title, $amount, $category]);
 
         // บันทึกสำเร็จ กลับไปหน้า expenses พร้อมแจ้งเตือน success
-        header("Location: expenses.php?status=success");
+        header("Location: User/expenses.php?status=success");
         exit();
 
     } catch (Exception $e) {
         // หากเกิดข้อผิดพลาด ให้กลับไปหน้า expenses พร้อมแจ้งเตือน error
-        header("Location: expenses.php?status=error");
+        header("Location: User/expenses.php?status=error");
         exit();
     }
 } else {
     // ถ้าไม่ได้เข้ามาผ่านวิธีกด Submit จากฟอร์ม ให้เด้งกลับหน้า expenses ทันที
-    header("Location: expenses.php");
+    header("Location: User/expenses.php");
     exit();
 }
 ?>

@@ -29,19 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE appointments SET title = ?, appointment_date = ?, start_time = ?, end_time = ?, status = ?, details = ? WHERE id = ?");
                 $stmt->execute([$title, $appointment_date, $start_time, $end_time, $status, $details, $id]);
                 
-                header("Location: calendar.php?status=success&action=edit&month={$redirect_month}&year={$redirect_year}");
+                header("Location: User/calendar.php?status=success&action=edit&month={$redirect_month}&year={$redirect_year}");
                 exit();
             } else {
                 // 2. เพิ่มข้อมูลใหม่ (Create)
                 $stmt = $pdo->prepare("INSERT INTO appointments (title, appointment_date, start_time, end_time, status, details) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$title, $appointment_date, $start_time, $end_time, $status, $details]);
                 
-                header("Location: calendar.php?status=success&action=add&month={$redirect_month}&year={$redirect_year}");
+                header("Location: User/calendar.php?status=success&action=add&month={$redirect_month}&year={$redirect_year}");
                 exit();
             }
         } catch (PDOException $e) {
             // กรณีเกิดข้อผิดพลาดจากฐานข้อมูล
-            header("Location: calendar.php?status=error&month={$redirect_month}&year={$redirect_year}");
+            header("Location: User/calendar.php?status=error&month={$redirect_month}&year={$redirect_year}");
             exit();
         }
     }
