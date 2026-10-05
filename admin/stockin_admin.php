@@ -4,7 +4,6 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
-
 require_once '../db/conn.php';
 require_once '../auth_check.php';
 $current_page = 'stockin'; // กำหนดหน้าปัจจุบันสำหรับ Sidebar
@@ -17,23 +16,14 @@ try {
     $productsList = [];
 }
 
-// 2. ดึงรายการโครงการ/หน้างาน ทั้งหมด (ตาราง installations)
-try {
-    $stmt_installations = $pdo->query("SELECT id, name FROM installations ORDER BY name ASC");
-    $installationsList = $stmt_installations->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $installationsList = [];
-}
-
-// 3. ดึงประวัติการรับเข้าสินค้าล่าสุด (type = 'in') รวมชื่อสินค้าและชื่อโครงการ
+// 2. ดึงประวัติการรับเข้าสินค้าล่าสุด (type = 'in')
 try {
     $stmt_history = $pdo->query("
-        SELECT st.*, p.name AS product_name, p.sku, i.name AS project_name
+        SELECT st.*, p.name as product_name, p.sku 
         FROM stock_transactions st
-        LEFT JOIN products p ON st.product_id = p.id
-        LEFT JOIN installations i ON st.installation_id = i.id
+        JOIN products p ON st.product_id = p.id
         WHERE st.type = 'in'
-        ORDER BY st.created_at DESC
+        ORDER BY st.created_at DESC 
         LIMIT 50
     ");
     $historyList = $stmt_history->fetchAll(PDO::FETCH_ASSOC);
@@ -55,15 +45,13 @@ try {
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        brandGreen: '#10b981'
-                    }
+                    fontFamily: { sans: ['Prompt', 'Inter', 'sans-serif'] },
+                    colors: { darkSidebar: '#000007', brandGreen: '#059669' }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Prompt', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
     </style>
@@ -71,11 +59,11 @@ try {
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
 
     <!-- Sidebar -->
-    <?php include 'sidebar.php'; ?>
+    <?php include 'sidebar_admin.php'; ?>
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
-
+        
         <!-- Header Bar -->
         <header class="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-10 shrink-0 z-10 shadow-xs">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">รับสินค้าเข้าคลัง (Stock In)</h2>
@@ -88,7 +76,7 @@ try {
 
         <!-- Main Body -->
         <div class="flex-1 overflow-y-auto p-10 space-y-6">
-
+            
             <!-- แจ้งเตือนสถานะ -->
             <?php if (isset($_GET['status'])): ?>
                 <?php if ($_GET['status'] == 'success'): ?>
@@ -112,8 +100,6 @@ try {
                 </div>
 
                 <form action="stockin_process.php" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    
-                    <!-- เลือกสินค้า -->
                     <div class="space-y-1.5 md:col-span-2">
                         <label class="block text-xs font-semibold text-slate-600">เลือกสินค้า (แสดงจำนวนคงเหลือในคลังปัจจุบัน)</label>
                         <select name="product_id" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
@@ -126,38 +112,21 @@ try {
                         </select>
                     </div>
 
-                    <!-- จำนวนที่รับเข้า -->
                     <div class="space-y-1.5">
                         <label class="block text-xs font-semibold text-slate-600">จำนวนที่รับเข้า</label>
                         <input type="number" name="quantity" min="1" required placeholder="ระบุจำนวน..." class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
                     </div>
 
-                    <!-- โครงการ / หน้างาน (คืนจากโครงการ) -->
-                    <div class="space-y-1.5 md:col-span-1">
-                        <label class="block text-xs font-semibold text-slate-600">โครงการ / หน้างาน (กรณีรับคืนจากโครงการ)</label>
-                        <select name="installation_id" class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
-                            <option value="">-- ไม่ระบุ / รับเข้าทั่วไป --</option>
-                            <?php foreach ($installationsList as $inst): ?>
-                                <option value="<?= $inst['id'] ?>">
-                                    <?= htmlspecialchars($inst['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- เลขที่อ้างอิง -->
-                    <div class="space-y-1.5 md:col-span-2">
+                    <div class="space-y-1.5">
                         <label class="block text-xs font-semibold text-slate-600">เลขที่อ้างอิง (Reference / PO)</label>
                         <input type="text" name="reference_no" placeholder="เช่น PO-2026-001..." class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
                     </div>
 
-                    <!-- หมายเหตุ / ผู้จำหน่าย -->
-                    <div class="space-y-1.5 md:col-span-3">
+                    <div class="space-y-1.5 md:col-span-2">
                         <label class="block text-xs font-semibold text-slate-600">หมายเหตุ / ผู้จำหน่าย (Supplier)</label>
-                        <input type="text" name="note" placeholder="เช่น รับสินค้าคืนจากโครงการ หรือ บริษัท..." class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
+                        <input type="text" name="note" placeholder="เช่น รับสินค้าจากบริษัทโซล่าเซลล์จำกัด..." class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
                     </div>
 
-                    <!-- ปุ่มกดยืนยัน -->
                     <div class="md:col-span-3 flex justify-end pt-2">
                         <button type="submit" class="bg-brandGreen hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl text-xs font-semibold shadow-md shadow-emerald-600/25 transition-all">
                             ยืนยันรับเข้าสินค้า
@@ -169,7 +138,7 @@ try {
             <!-- ตารางประวัติการรับเข้าสินค้าล่าสุด -->
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden p-6 space-y-4">
                 <h3 class="text-base font-bold text-slate-900 px-2">ประวัติการรับเข้าสินค้าล่าสุด</h3>
-
+                
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -177,7 +146,6 @@ try {
                                 <th class="py-3 px-4 font-semibold">วันที่ / เวลา</th>
                                 <th class="py-3 px-4 font-semibold">ชื่อสินค้า</th>
                                 <th class="py-3 px-4 font-semibold text-right">จำนวนที่รับเข้า</th>
-                                <th class="py-3 px-4 font-semibold">โครงการ / หน้างาน</th>
                                 <th class="py-3 px-4 font-semibold">เลขที่อ้างอิง</th>
                                 <th class="py-3 px-4 font-semibold">หมายเหตุ</th>
                             </tr>
@@ -188,18 +156,17 @@ try {
                                     <tr class="hover:bg-slate-50/80 transition-all">
                                         <td class="py-3.5 px-4 text-slate-500"><?= htmlspecialchars($row['created_at']) ?></td>
                                         <td class="py-3.5 px-4 font-bold text-slate-900">
-                                            <?= htmlspecialchars($row['product_name'] ?? '-') ?>
+                                            <?= htmlspecialchars($row['product_name']) ?>
                                             <div class="text-[10px] text-slate-400 font-normal">SKU: <?= htmlspecialchars($row['sku'] ?? '-') ?></div>
                                         </td>
                                         <td class="py-3.5 px-4 text-right font-bold text-emerald-600">+<?= number_format($row['quantity']) ?></td>
-                                        <td class="py-3.5 px-4 text-blue-600 font-semibold"><?= htmlspecialchars($row['project_name'] ?? '-') ?></td>
                                         <td class="py-3.5 px-4 text-slate-600"><?= htmlspecialchars($row['reference_no'] ?: '-') ?></td>
                                         <td class="py-3.5 px-4 text-slate-500"><?= htmlspecialchars($row['note'] ?: '-') ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="py-10 text-center text-slate-400 font-normal">ยังไม่มีประวัติการรับเข้าสินค้าในระบบ</td>
+                                    <td colspan="5" class="py-10 text-center text-slate-400 font-normal">ยังไม่มีประวัติการรับเข้าสินค้าในระบบ</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

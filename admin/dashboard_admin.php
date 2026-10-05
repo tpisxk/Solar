@@ -99,8 +99,8 @@ foreach ($chart_products as $cp) {
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
 
     <?php 
-    if (file_exists('sidebar.php')) {
-        include 'sidebar.php'; 
+    if (file_exists('sidebar_admin.php')) {
+        include 'sidebar_admin.php'; 
     }
     ?>
 

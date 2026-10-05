@@ -23,14 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($user && (password_verify($password, $user['password']) || $password === $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
+        $_SESSION['name'] = $user['name']; // บันทึกชื่อจริง
         $_SESSION['role'] = strtolower($user['type_name']); 
-        $_SESSION['user_type_id'] = $user['user_type_id']; 
+        $_SESSION['user_type_id'] = $user['user_type_id']; // รหัสสิทธิ์ (เช่น 1=Admin, 2=CEO, 3=User)
         
-        $login_success = true; // ตั้งค่าสถานะเป็นจริงเพื่อเรียกใช้งาน SweetAlert แจ้งเตือนสำเร็จ
+        $login_success = true; 
     } else {
         $error = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -125,24 +127,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             btnIcon.className = 'fa-solid fa-circle-notch fa-spin'; // เปลี่ยนเป็นไอคอนหมุน
         });
 
-        // หาก PHP ตรวจสอบรหัสผ่านผ่านแล้ว ให้แสดง Pop-up แจ้งเตือนสำเร็จขนาดเล็ก
         <?php if ($login_success): ?>
-        Swal.fire({
-            icon: 'success',
-            title: 'เข้าสู่ระบบสำเร็จ!',
-            text: 'กำลังพาท่านเข้าสู่ระบบ...',
-            timer: 2000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-            didClose: () => {
-                window.location.href = 'User/dashboard.php';
-            }
-        });
-        // เผื่อกรณีกดปิดหรือหมดเวลา ให้เด้งไปหน้า Dashboard ทันที
-        setTimeout(() => {
-            window.location.href = 'User/dashboard.php';
-        }, 2000);
-        <?php endif; ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'เข้าสู่ระบบสำเร็จ!',
+        text: 'กำลังพาท่านเข้าสู่ระบบ...',
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        didClose: () => {
+            redirectUser();
+        }
+    });
+
+    setTimeout(() => {
+        redirectUser();
+    }, 1500);
+
+    function redirectUser() {
+        // กำหนดเงื่อนไขพาไปแต่ละ Dashboard ตามสิทธิ์
+        const userTypeId = "<?php echo $_SESSION['user_type_id']; ?>";
+        
+        if (userTypeId == '1') {
+            window.location.href = 'admin/dashboard_admin.php'; // สิทธิ์ Admin
+        } else if (userTypeId == '2') {
+            window.location.href = 'ceo/dashboard.php';         // สิทธิ์ CEO
+        } else {
+            window.location.href = 'User/dashboard.php';        // สิทธิ์ User ทั่วไป
+        }
+    }
+    <?php endif; ?>
     </script>
 </body>
 </html>

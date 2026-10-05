@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity       = isset($_POST['quantity']) ? intval($_POST['quantity']) : 0;
     $installation_id = !empty($_POST['installation_id']) ? intval($_POST['installation_id']) : null;
     $note           = isset($_POST['note']) ? trim($_POST['note']) : '';
-    $user_id    = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 1;
+    $employee_id    = isset($_SESSION['employee_id']) ? intval($_SESSION['employee_id']) : 1;
 
     if ($product_id <= 0 || $quantity <= 0) {
         header("Location: stockout.php?status=error");
@@ -42,22 +42,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 3. บันทึกประวัติการเบิกออก (พร้อมระบุ installation_id เพื่อเชื่อมกับโครงการ)
         $stmt_insert = $pdo->prepare("
-            INSERT INTO stock_transactions (product_id, installation_id, type, quantity, reference_no, user_id, note, created_at) 
+            INSERT INTO stock_transactions (product_id, installation_id, type, quantity, reference_no, employee_id, note, created_at) 
             VALUES (?, ?, 'out', ?, '', ?, ?, NOW())
         ");
-        $stmt_insert->execute([$product_id, $installation_id, $quantity, $user_id, $note]);
+        $stmt_insert->execute([$product_id, $installation_id, $quantity, $employee_id, $note]);
 
         $pdo->commit();
-        header("Location: stockout.php?status=success");
+        header("Location: stockout_admin.php?status=success");
         exit();
 
     } catch (Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
-        header("Location: stockout.php?status=error");
+        header("Location: stockout_admin.php?status=error");
         exit();
     }
 } else {
-    header("Location: stockout.php");
+    header("Location: stockout_admin.php");
     exit();
 }
 ?>
