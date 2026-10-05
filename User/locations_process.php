@@ -1,6 +1,11 @@
 <?php
-require_once 'conn.php';
-
+session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once '../db/conn.php';
+require_once '../auth_check.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name        = isset($_POST['name']) ? trim($_POST['name']) : '';
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';

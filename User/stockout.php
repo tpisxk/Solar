@@ -1,5 +1,11 @@
 <?php
-require_once 'conn.php';
+session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once '../db/conn.php';
+require_once '../auth_check.php';
 $current_page = 'User/stockout'; // กำหนดหน้าปัจจุบันสำหรับ Sidebar
 
 // 1. ดึงยอดรวมจำนวนสินค้าทั้งหมดในคลัง สำหรับแสดงที่ Sidebar (ใช้ stock_quantity)
@@ -40,6 +46,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จ่ายออกสินค้า - SolarStock Pro</title>
+    <link rel="icon" type="image/png" href="../Pic/456456.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">

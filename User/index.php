@@ -1,7 +1,12 @@
 <?php
 // เรียกใช้งานไฟล์เชื่อมต่อฐานข้อมูลที่แยกไว้
-require_once 'conn.php';
-
+session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once '../db/conn.php';
+require_once '../auth_check.php';
 // ดึงข้อมูลสินค้าจากตาราง products มาแสดงผล
 $stmt =$pdo->query("SELECT * FROM products ORDER BY id DESC");
 $products =$stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -12,6 +17,7 @@ $products =$stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SolarStock Pro - Modern Edition</title>
+    <link rel="icon" type="image/png" href="../Pic/456456.png">
     <!-- โหลด Tailwind CSS สำหรับจัดการดีไซน์ และ Google Fonts (Prompt & Inter) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -165,6 +171,7 @@ $products =$stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         switchPage('calendar');
+     
     </script>
 </body>
 </html>

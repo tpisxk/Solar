@@ -1,6 +1,11 @@
 <?php
-require_once 'conn.php';
-
+session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once '../db/conn.php';
+require_once '../auth_check.php';
 // ดึงข้อมูลสินค้าทั้งหมด เรียงตามรหัส SKU
 $stmt = $pdo->query("SELECT * FROM products ORDER BY sku ASC");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -26,6 +31,7 @@ sort($skuGroups);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สต็อกคงเหลือ - SolarStock Pro</title>
+    <link rel="icon" type="image/png" href="../Pic/456456.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -234,6 +240,7 @@ sort($skuGroups);
             document.getElementById('importModal').classList.remove('flex');
             document.getElementById('importModal').classList.add('hidden');
         }
+     
     </script>
 </body>
 </html>

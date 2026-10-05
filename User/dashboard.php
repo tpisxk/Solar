@@ -1,5 +1,11 @@
 <?php
-require_once 'conn.php';
+session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once '../db/conn.php';
+require_once '../auth_check.php';
 $current_page = 'dashboard';
 
 // กำหนดค่าเริ่มต้นเพื่อป้องกัน Error
@@ -72,6 +78,7 @@ foreach ($chart_products as $cp) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard สรุปภาพรวม - SolarStock Pro</title>
+    <link rel="icon" type="image/png" href="../Pic/456456.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js สำหรับแสดงกราฟ -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -299,7 +306,24 @@ foreach ($chart_products as $cp) {
 
         </div>
     </main>
-
+    <!-- Banner Dropdown ยินดีต้อนรับ -->
+<div id="welcomeBanner" class="fixed top-0 left-0 right-0 z-50 transform -translate-y-full transition-transform duration-500 ease-in-out">
+    <div class="max-w-xl mx-auto m-4 bg-emerald-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center justify-between border border-emerald-500">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">
+                <i class="fa-solid fa-face-smile"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm">ยินดีต้อนรับสู่ระบบ, <?php echo htmlspecialchars($_SESSION['username'] ?? 'ผู้ใช้งาน'); ?>!</h4>
+                <p class="text-xs text-emerald-100">ระบบ Solarwing Stock Management พร้อมใช้งานแล้ว</p>
+            </div>
+        </div>
+        <button onclick="closeWelcomeBanner()" class="text-emerald-200 hover:text-white transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+    </div>
+</div>
+    
     <!-- สคริปต์สร้างกราฟด้วย Chart.js -->
     <script>
         // ข้อมูลสำหรับกราฟแท่ง
@@ -357,6 +381,8 @@ foreach ($chart_products as $cp) {
                 cutout: '70%'
             }
         });
+        
+    
     </script>
 </body>
 </html>
