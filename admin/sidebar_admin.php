@@ -4,8 +4,16 @@ $current_page = basename($_SERVER['PHP_SELF'], ".php");
 
 $display_name = $_SESSION['name'] ?? '';
 $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
+// นับจำนวนผู้ใช้งานทั้งหมดในตาราง users
+try {
+    $stmt_user_count = $pdo->query("SELECT COUNT(*) FROM users");
+    $user_count = $stmt_user_count->fetchColumn();
+} catch (PDOException $e) {
+    $user_count = 0; // เผื่อกรณีเกิด Error ให้แสดงเป็น 0
+}
 ?>
 <!-- 🌐 ส่วนเมนูด้านซ้าย (Sidebar) -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,22 +27,35 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Prompt', 'Inter', 'sans-serif'] },
-                    colors: { darkSidebar: '#000000', brandGreen: '#059669' }
+                    fontFamily: {
+                        sans: ['Prompt', 'Inter', 'sans-serif']
+                    },
+                    colors: {
+                        darkSidebar: '#000000',
+                        brandGreen: '#059669'
+                    }
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
     </style>
 </head>
+
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
 
     <!-- Sidebar (กำหนด id สำหรับควบคุมเฉพาะส่วนนี้) -->
     <aside id="appSidebar" class="w-64 bg-darkSidebar text-slate-300 flex flex-col h-full shrink-0 border-r border-slate-800 transition-colors duration-200">
-        
+
         <!-- Header โลโก้ -->
         <div id="sidebarHeader" class="h-20 flex items-center px-6 border-b border-slate-800/80 gap-3 transition-colors duration-200">
             <img src="../Pic/SW.png" alt="SW.png" class="w-8 h-8 object-contain">
@@ -67,8 +88,13 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
             <a href="locations_admin.php" class="menu-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'locations_admin') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
                 <i class="fas fa-map-marker-alt w-5 text-center text-sm"></i> สถานที่ติดตั้ง
             </a>
-            
-            <div class="pt-3 pb-2"><hr id="sidebarDivider" class="border-slate-800/80 transition-colors duration-200"></div>
+            <a href="expenses_summary_admin.php" class="menu-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'expenses_summary_admin') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
+                <i class="fas fa-file-invoice w-5 text-center text-sm"></i> สรุปค่าใช้จ่าย
+            </a>
+
+            <div class="pt-3 pb-2">
+                <hr id="sidebarDivider" class="border-slate-800/80 transition-colors duration-200">
+            </div>
 
             <a href="orders_admin.php" class="menu-item w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'orders_admin') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
                 <div class="flex items-center gap-3.5"><i class="fas fa-shopping-bag w-5 text-center text-sm"></i> สั่งซื้อสินค้า</div>
@@ -79,7 +105,15 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
                 <span class="bg-emerald-950/80 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-800/50">0</span>
             </a>
             <a href="manage_users.php" class="menu-item w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'manage_users') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
-                <div class="flex items-center gap-3.5"><i class="fas fa-circle-user w-5 text-center text-sm"></i> จัดการผู้ใช้งาน</div>
+                <div class="flex items-center gap-3.5">
+                    <i class="fas fa-circle-user w-5 text-center text-sm"></i> จัดการผู้ใช้งาน
+                </div>
+                <span class="bg-emerald-950/80 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-800/50">
+                    <?= number_format($user_count) ?>
+                </span>
+            </a>
+            <a href="add_user.php" class="menu-item w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'add_user') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
+                <div class="flex items-center gap-3.5"><i class="fas fa-user-plus w-5 text-center text-sm"></i> เพิ่มผู้ใช้งาน</div>
                 <span class="bg-emerald-950/80 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-800/50">0</span>
             </a>
         </div>
@@ -100,14 +134,14 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
                 </div>
 
                 <!-- 🌓 ปุ่มสลับโหมด Sidebar -->
-                <button onclick="toggleSidebarTheme()" id="themeToggleBtn" title="สลับโหมดแถบเมนู" 
-                        class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 flex items-center justify-center transition border border-slate-700/60 shrink-0">
+                <button onclick="toggleSidebarTheme()" id="themeToggleBtn" title="สลับโหมดแถบเมนู"
+                    class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 flex items-center justify-center transition border border-slate-700/60 shrink-0">
                     <i id="themeIcon" class="fas fa-sun text-xs"></i>
                 </button>
             </div>
 
-            <a href="../logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?');" 
-               class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-xs font-semibold transition border border-rose-500/20">
+            <a href="../logout.php" onclick="return confirm('คุณต้องการออกจากระบบใช่หรือไม่?');"
+                class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 text-xs font-semibold transition border border-rose-500/20">
                 <i class="fas fa-sign-out-alt text-xs"></i> ออกจากระบบ
             </a>
         </div>
@@ -151,7 +185,7 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
             sidebarDivider.className = "border-slate-200 transition-colors duration-200";
             sidebarFooter.className = "p-4 border-t border-slate-200 bg-slate-50 space-y-3 transition-colors duration-200";
             userNameText.className = "text-xs font-bold text-slate-900 truncate";
-            
+
             themeToggleBtn.className = "w-9 h-9 rounded-xl bg-slate-200 hover:bg-slate-300 text-amber-500 flex items-center justify-center transition border border-slate-300 shrink-0";
             themeIcon.className = "fas fa-moon text-xs text-slate-700";
 
@@ -189,5 +223,4 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
             });
         }
         // ป้องกันกรณีผู้ใช้กดปุ่ม Back แล้วเจอหน้า Login ค้าง
-   
     </script>

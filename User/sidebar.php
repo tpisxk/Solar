@@ -67,6 +67,9 @@ $display_role = $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin';
             <a href="locations.php" class="menu-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'locations') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
                 <i class="fas fa-map-marker-alt w-5 text-center text-sm"></i> สถานที่ติดตั้ง
             </a>
+            <a href="expenses_summary.php" class="menu-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all <?= ($current_page == 'expenses_summary') ? 'bg-brandGreen text-white shadow-md shadow-emerald-900/20' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' ?>">
+                <i class="fas fas fa-file-invoice w-5 text-center text-sm"></i> สรุปค่าใช้จ่าย
+            </a>
             
             <div class="pt-3 pb-2"><hr id="sidebarDivider" class="border-slate-800/80 transition-colors duration-200"></div>
 

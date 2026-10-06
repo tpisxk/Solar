@@ -26,20 +26,15 @@ if (!$target_user) {
 }
 
 // ==========================================
-// 1. ดึงรายชื่อโครงการทั้งหมดที่ User คนนี้เคยเบิก เพื่อทำตัวกรอง (Dropdown)
+// 1. ดึงรายชื่อโครงการทั้งหมดที่มีในระบบ เพื่อทำตัวกรอง (Dropdown)
 // ==========================================
 $projects_filter = [];
 try {
-    $stmt_proj = $pdo->prepare("
-        SELECT DISTINCT i.id, i.name AS project_name 
-        FROM stock_transactions s
-        JOIN installations i ON s.installation_id = i.id
-        WHERE s.user_id = ? AND s.type = 'out'
-    ");
-    $stmt_proj->execute([$target_user_id]);
+    // ดึงโครงการทั้งหมดจากตาราง installations ให้แสดงใน Dropdown เสมอ
+    $stmt_proj = $pdo->query("SELECT id, name AS project_name FROM installations ORDER BY name ASC");
     $projects_filter = $stmt_proj->fetchAll();
 } catch (Exception $e) {
-    // หาก error จะข้ามไป
+    $projects_filter = [];
 }
 
 // ==========================================
@@ -48,7 +43,7 @@ try {
 $selected_project_id = $_GET['project_id'] ?? '';
 
 // ==========================================
-// 3. ดึงประวัติการเบิกจ่าย (ปรับแก้ p.name และ i.name ใช้ AS แยกกันชัดเจน)
+// 3. ดึงประวัติการเบิกจ่าย
 // ==========================================
 $logs = [];
 try {
@@ -84,6 +79,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../Pic/456456.png">
     <title>ประวัติการเบิกจ่ายของ <?php echo htmlspecialchars($target_user['name']); ?> - SolarWing Stock</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -154,7 +150,7 @@ try {
                             <tr class="hover:bg-slate-50/80 transition">
                                 <td class="p-4 font-mono text-slate-400">#<?php echo $log['id']; ?></td>
                                 <td class="p-4">
-                                    <!-- แก้ไขจุดนี้: ดึงจาก product_name -->
+                                    <!-- ดึงจาก product_name -->
                                     <div class="font-bold text-slate-800"><?php echo htmlspecialchars($log['product_name'] ?? 'ไม่พบชื่อสินค้า'); ?></div>
                                     <?php if (!empty($log['sku'])): ?>
                                         <div class="text-[10px] text-slate-400 font-mono">SKU: <?php echo htmlspecialchars($log['sku']); ?></div>

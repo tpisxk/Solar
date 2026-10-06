@@ -44,34 +44,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../Pic/456456.png">
     <title>เพิ่มสินค้าใหม่ - SolarStock Pro</title>
     <!-- โหลด Favicon ของโปรเจกต์ -->
     <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
 
     <div class="flex h-screen overflow-hidden">
-        
+
         <!-- ดึง Sidebar โทนสีขาวมาแสดงผลอัตโนมัติ -->
         <?php include 'sidebar_admin.php'; ?>
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col overflow-y-auto">
-            
+
             <!-- Header ด้านบน (โทนสีขาวสะอาดตา) -->
             <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10 shadow-xs">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800">เพิ่มสินค้า / อุปกรณ์โซล่าเซลล์</h2>
-                <div class="text-sm text-slate-500">ผู้ใช้งาน: <span class="text-slate-800 font-medium"><?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?></span></div>
+                <a href="dashboard_admin.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-house text-emerald-600"></i> หน้าหลัก
+                </a>
             </header>
 
             <!-- Form Content -->
             <main class="p-8 max-w-4xl w-full mx-auto">
-                
+
                 <?php if (!empty($success_msg)): ?>
                     <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-lg">
                         <?php echo $success_msg; ?>
@@ -128,4 +133,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
 </body>
+
 </html>

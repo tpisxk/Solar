@@ -4,18 +4,19 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
 require_once '../db/conn.php';
 require_once '../auth_check.php';
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_id     = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
-    $quantity       = isset($_POST['quantity']) ? intval($_POST['quantity']) : 0;
-    $installation_id = !empty($_POST['installation_id']) ? intval($_POST['installation_id']) : null;
-    $note           = isset($_POST['note']) ? trim($_POST['note']) : '';
-    $user_id    = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 1;
+    $product_id      = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+    $quantity        = isset($_POST['quantity']) ? intval($_POST['quantity']) : 0;
+    $installation_id = !empty($_POST['installation_id']) ? intval($_POST['installation_id']) : 0;
+    $note            = isset($_POST['note']) ? trim($_POST['note']) : '';
+    $user_id         = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 1;
 
-    if ($product_id <= 0 || $quantity <= 0) {
+    // ตรวจสอบค่าที่ส่งมา: บังคับให้ product_id, quantity และ installation_id ต้องมากกว่า 0
+    if ($product_id <= 0 || $quantity <= 0 || $installation_id <= 0) {
         header("Location: stockout.php?status=error");
         exit();
     }
@@ -23,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // 1. ตรวจสอบสต็อกปัจจุบัน
+        // 1. ตรวจสอบสต็อกปัจจุบัน (ใช้ FOR UPDATE เพื่อป้องกัน Race Condition)
         $stmt_check = $pdo->prepare("SELECT stock_quantity FROM products WHERE id = ? FOR UPDATE");
         $stmt_check->execute([$product_id]);
         $product = $stmt_check->fetch(PDO::FETCH_ASSOC);
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_update = $pdo->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
         $stmt_update->execute([$new_stock, $product_id]);
 
-        // 3. บันทึกประวัติการเบิกออก (พร้อมระบุ installation_id เพื่อเชื่อมกับโครงการ)
+        // 3. บันทึกประวัติการเบิกออก (เชื่อมโยงกับ installation_id เสมอ)
         $stmt_insert = $pdo->prepare("
             INSERT INTO stock_transactions (product_id, installation_id, type, quantity, reference_no, user_id, note, created_at) 
             VALUES (?, ?, 'out', ?, '', ?, ?, NOW())
@@ -52,7 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
 
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         header("Location: stockout.php?status=error");
         exit();
     }

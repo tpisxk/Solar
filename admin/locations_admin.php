@@ -35,6 +35,7 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,17 +48,30 @@ try {
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Prompt', 'Inter', 'sans-serif'] },
-                    colors: { darkSidebar: '#000007', brandGreen: '#059669' }
+                    fontFamily: {
+                        sans: ['Prompt', 'Inter', 'sans-serif']
+                    },
+                    colors: {
+                        darkSidebar: '#000007',
+                        brandGreen: '#059669'
+                    }
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
     </style>
 </head>
+
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
 
     <!-- Sidebar -->
@@ -65,20 +79,20 @@ try {
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
-        
+
         <!-- Header Bar -->
         <header class="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-10 shrink-0 z-10 shadow-xs">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">จัดการโครงการและแผนที่หน้างานติดตั้ง</h2>
             <div class="flex items-center gap-3">
-                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-4 py-1.5 rounded-full text-xs font-semibold">
-                    โครงการทั้งหมด: <?= count($locationsList) ?> โครงการ
-                </span>
+                <a href="dashboard_admin.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-house text-emerald-600"></i> หน้าหลัก
+                </a>
             </div>
         </header>
 
         <!-- Main Body -->
         <div class="flex-1 overflow-y-auto p-10 space-y-6">
-            
+
             <!-- แจ้งเตือนสถานะ -->
             <?php if (isset($_GET['status'])): ?>
                 <?php if ($_GET['status'] == 'success'): ?>
@@ -128,7 +142,7 @@ try {
             <!-- ตารางแสดงรายการโครงการ พิกัดแผนที่ และต้นทุนอุปกรณ์ -->
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden p-6 space-y-4">
                 <h3 class="text-base font-bold text-slate-900 px-2">รายการโครงการ แผนที่ และต้นทุนอุปกรณ์สุทธิ</h3>
-                
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -142,7 +156,7 @@ try {
                         </thead>
                         <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
                             <?php if (!empty($locationsList)): ?>
-                                <?php foreach ($locationsList as $loc): 
+                                <?php foreach ($locationsList as $loc):
                                     $total_out = $loc['total_out'] ?? 0;
                                     $total_return = $loc['total_return'] ?? 0;
                                     $net_cost = $total_out - $total_return;
@@ -186,4 +200,5 @@ try {
     </main>
 
 </body>
+
 </html>

@@ -69,11 +69,9 @@ try {
         <!-- Header Bar -->
         <header class="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-10 shrink-0 z-10 shadow-xs">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">จัดการโครงการและแผนที่หน้างานติดตั้ง</h2>
-            <div class="flex items-center gap-3">
-                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-4 py-1.5 rounded-full text-xs font-semibold">
-                    โครงการทั้งหมด: <?= count($locationsList) ?> โครงการ
-                </span>
-            </div>
+            <a href="dashboard.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-house text-emerald-600"></i> หน้าหลัก
+            </a>
         </header>
 
         <!-- Main Body -->

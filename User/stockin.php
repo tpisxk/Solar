@@ -51,6 +51,11 @@ try {
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tom Select CDN (Searchable Select) -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -66,6 +71,35 @@ try {
         body { font-family: 'Prompt', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+
+        /* Custom Tom Select Style ให้กลมกลืนกับ Tailwind Class เดิม */
+        .ts-control {
+            border-radius: 1rem !important; /* rounded-2xl */
+            padding: 0.75rem 1rem !important; /* py-3 px-4 */
+            border-color: #e2e8f0 !important; /* border-slate-200 */
+            background-color: #f8fafc !important; /* bg-slate-50 */
+            font-size: 0.75rem !important; /* text-xs */
+            font-family: 'Prompt', sans-serif !important;
+            font-weight: 500 !important;
+        }
+        .ts-wrapper.focus .ts-control {
+            border-color: #10b981 !important; /* focus:border-emerald-600 */
+            box-shadow: 0 0 0 1px #10b981 !important;
+        }
+        .ts-dropdown {
+            border-radius: 1rem !important;
+            overflow: hidden;
+            font-size: 0.75rem !important;
+            font-family: 'Prompt', sans-serif !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+        }
+        .ts-dropdown .option {
+            padding: 0.6rem 1rem !important;
+        }
+        .ts-dropdown .active {
+            background-color: #ecfdf5 !important;
+            color: #047857 !important;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
@@ -79,11 +113,9 @@ try {
         <!-- Header Bar -->
         <header class="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-10 shrink-0 z-10 shadow-xs">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">รับสินค้าเข้าคลัง (Stock In)</h2>
-            <div class="flex items-center gap-3">
-                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-4 py-1.5 rounded-full text-xs font-semibold">
-                    ระบบจัดการคลังสินค้าโซล่าเซลล์
-                </span>
-            </div>
+            <a href="dashboard.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-house text-emerald-600"></i> หน้าหลัก
+            </a>
         </header>
 
         <!-- Main Body -->
@@ -113,11 +145,11 @@ try {
 
                 <form action="stockin_process.php" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     
-                    <!-- เลือกสินค้า -->
+                    <!-- เลือกสินค้า (รองรับการค้นหา) -->
                     <div class="space-y-1.5 md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600">เลือกสินค้า (แสดงจำนวนคงเหลือในคลังปัจจุบัน)</label>
-                        <select name="product_id" required class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
-                            <option value="">-- กรุณาเลือกสินค้า --</option>
+                        <label class="block text-xs font-semibold text-slate-600">เลือกสินค้า (แสดงจำนวนคงเหลือในคลังปัจจุบัน) <span class="text-rose-500">*</span></label>
+                        <select id="product_select" name="product_id" required>
+                            <option value="">-- พิมพ์เพื่อค้นหา หรือเลือกสินค้า --</option>
                             <?php foreach ($productsList as $prod): ?>
                                 <option value="<?= $prod['id'] ?>">
                                     <?= htmlspecialchars($prod['name']) ?> (SKU: <?= htmlspecialchars($prod['sku'] ?? '-') ?>) — คงเหลือ: <?= $prod['stock_quantity'] ?> ชิ้น
@@ -128,14 +160,14 @@ try {
 
                     <!-- จำนวนที่รับเข้า -->
                     <div class="space-y-1.5">
-                        <label class="block text-xs font-semibold text-slate-600">จำนวนที่รับเข้า</label>
+                        <label class="block text-xs font-semibold text-slate-600">จำนวนที่รับเข้า <span class="text-rose-500">*</span></label>
                         <input type="number" name="quantity" min="1" required placeholder="ระบุจำนวน..." class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
                     </div>
 
-                    <!-- โครงการ / หน้างาน (คืนจากโครงการ) -->
+                    <!-- โครงการ / หน้างาน (รองรับการค้นหา) -->
                     <div class="space-y-1.5 md:col-span-1">
                         <label class="block text-xs font-semibold text-slate-600">โครงการ / หน้างาน (กรณีรับคืนจากโครงการ)</label>
-                        <select name="installation_id" class="w-full px-4 py-3 border border-slate-200 rounded-2xl text-xs bg-slate-50 focus:outline-none focus:border-emerald-600 font-medium">
+                        <select id="installation_select" name="installation_id">
                             <option value="">-- ไม่ระบุ / รับเข้าทั่วไป --</option>
                             <?php foreach ($installationsList as $inst): ?>
                                 <option value="<?= $inst['id'] ?>">
@@ -210,5 +242,23 @@ try {
         </div>
     </main>
 
+    <!-- Script สำหรับเรียกใช้งาน Tom Select -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown เลือกสินค้า
+            new TomSelect("#product_select", {
+                create: false,
+                placeholder: "-- พิมพ์เพื่อค้นหา หรือเลือกสินค้า --",
+                sortField: { field: "text", direction: "asc" }
+            });
+
+            // Dropdown เลือกโครงการ / หน้างาน
+            new TomSelect("#installation_select", {
+                create: false,
+                placeholder: "-- ไม่ระบุ / รับเข้าทั่วไป --",
+                sortField: { field: "text", direction: "asc" }
+            });
+        });
+    </script>
 </body>
 </html>

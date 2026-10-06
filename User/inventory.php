@@ -60,11 +60,9 @@ sort($skuGroups);
         <!-- Header Bar -->
         <header class="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-10 shrink-0 z-10 shadow-xs">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">สต็อกคงเหลือ (Inventory Status)</h2>
-            <div class="flex items-center gap-3">
-                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> MySQL Database Active
-                </span>
-            </div>
+            <a href="dashboard.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-house text-emerald-600"></i> หน้าหลัก
+            </a>
         </header>
 
         <!-- Main Body -->
@@ -130,7 +128,7 @@ sort($skuGroups);
                         <tr>
                             <th class="p-5">รหัส SKU</th>
                             <th class="p-5">ชื่อสินค้า</th>
-                            <th class="p-5">หมวดหมู่</th>
+                            <th class="p-5">หนวยนับ</th>
                             <th class="p-5 text-right">ราคาต้นทุน</th>
                             <th class="p-5 text-right">ราคาขาย</th>
                             <th class="p-5 text-right">คงเหลือ</th>

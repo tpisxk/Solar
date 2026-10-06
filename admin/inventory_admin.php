@@ -17,7 +17,7 @@ foreach ($products as $row) {
     if (!empty($sku) && mb_strlen($sku, 'UTF-8') >= 2) {
         // ตัดเอา 2 ตัวอักษรแรก และแปลงเป็นตัวพิมพ์ใหญ่
         $prefix = strtoupper(mb_substr($sku, 0, 2, 'UTF-8'));
-        
+
         if (!in_array($prefix, $skuGroups)) {
             $skuGroups[] = $prefix;
         }
@@ -27,6 +27,7 @@ sort($skuGroups);
 ?>
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,42 +35,55 @@ sort($skuGroups);
     <link rel="icon" type="image/png" href="../Pic/456456.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Prompt', 'Inter', 'sans-serif'] },
-                    colors: { darkSidebar: '#000007', brandGreen: '#059669' }
+                    fontFamily: {
+                        sans: ['Prompt', 'Inter', 'sans-serif']
+                    },
+                    colors: {
+                        darkSidebar: '#000007',
+                        brandGreen: '#059669'
+                    }
                 }
             }
         }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
     </style>
 </head>
+
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
 
     <!-- เรียกใช้งาน Sidebar -->
     <?php include 'sidebar_admin.php'; ?>
 
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
-        
+
         <!-- Header Bar -->
         <header class="h-20 bg-white border-b border-slate-200/80 flex items-center justify-between px-10 shrink-0 z-10 shadow-xs">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight">สต็อกคงเหลือ (Inventory Status)</h2>
             <div class="flex items-center gap-3">
-                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> MySQL Database Active
-                </span>
+                <a href="dashboard_admin.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-house text-emerald-600"></i> หน้าหลัก
+                </a>
             </div>
         </header>
 
         <!-- Main Body -->
         <div class="flex-1 overflow-y-auto p-10 space-y-6">
-            
+
             <!-- แจ้งเตือนสถานะการ Import -->
             <?php if (isset($_GET['import'])): ?>
                 <?php if ($_GET['import'] == 'success'): ?>
@@ -105,17 +119,17 @@ sort($skuGroups);
                     📂 ทั้งหมด (<?= count($products) ?>)
                 </button>
                 <?php foreach ($skuGroups as $grp): ?>
-                    <?php 
-                        $grpCount = 0;
-                        foreach ($products as $p) {
-                            $pSku = trim($p['sku']);
-                            if (mb_strlen($pSku, 'UTF-8') >= 2) {
-                                $pPrefix = strtoupper(mb_substr($pSku, 0, 2, 'UTF-8'));
-                                if ($pPrefix === $grp) {
-                                    $grpCount++;
-                                }
+                    <?php
+                    $grpCount = 0;
+                    foreach ($products as $p) {
+                        $pSku = trim($p['sku']);
+                        if (mb_strlen($pSku, 'UTF-8') >= 2) {
+                            $pPrefix = strtoupper(mb_substr($pSku, 0, 2, 'UTF-8'));
+                            if ($pPrefix === $grp) {
+                                $grpCount++;
                             }
                         }
+                    }
                     ?>
                     <button onclick="filterGroup('<?= $grp ?>')" id="group-<?= $grp ?>" class="group-tab px-5 py-2.5 rounded-2xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all shrink-0">
                         🏷️ หมวด <?= $grp ?> (<?= $grpCount ?>)
@@ -139,20 +153,20 @@ sort($skuGroups);
                     <tbody class="divide-y divide-slate-100" id="productTableBody">
                         <?php if (count($products) > 0): ?>
                             <?php foreach ($products as $row): ?>
-                                <?php 
-                                    $sku = trim($row['sku']);
-                                    $rowGroup = (mb_strlen($sku, 'UTF-8') >= 2) ? strtoupper(mb_substr($sku, 0, 2, 'UTF-8')) : 'OT';
+                                <?php
+                                $sku = trim($row['sku']);
+                                $rowGroup = (mb_strlen($sku, 'UTF-8') >= 2) ? strtoupper(mb_substr($sku, 0, 2, 'UTF-8')) : 'OT';
                                 ?>
-                            <tr class="hover:bg-slate-50/80 transition-colors product-row" data-sku-prefix="<?= $rowGroup ?>">
-                                <td class="p-5 font-bold text-slate-700">
-                                    <span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-xl text-emerald-700"><?= htmlspecialchars($row['sku']) ?></span>
-                                </td>
-                                <td class="p-5 font-bold text-slate-900"><?= htmlspecialchars($row['name']) ?></td>
-                                <td class="p-5 text-slate-500"><?= htmlspecialchars($row['category']) ?></td>
-                                <td class="p-5 text-right font-medium">฿<?= number_format($row['cost_price'], 2) ?></td>
-                                <td class="p-5 text-right font-medium">฿<?= number_format($row['selling_price'], 2) ?></td>
-                                <td class="p-5 text-right font-bold text-brandGreen"><?= number_format($row['stock_quantity']) ?></td>
-                            </tr>
+                                <tr class="hover:bg-slate-50/80 transition-colors product-row" data-sku-prefix="<?= $rowGroup ?>">
+                                    <td class="p-5 font-bold text-slate-700">
+                                        <span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-xl text-emerald-700"><?= htmlspecialchars($row['sku']) ?></span>
+                                    </td>
+                                    <td class="p-5 font-bold text-slate-900"><?= htmlspecialchars($row['name']) ?></td>
+                                    <td class="p-5 text-slate-500"><?= htmlspecialchars($row['category']) ?></td>
+                                    <td class="p-5 text-right font-medium">฿<?= number_format($row['cost_price'], 2) ?></td>
+                                    <td class="p-5 text-right font-medium">฿<?= number_format($row['selling_price'], 2) ?></td>
+                                    <td class="p-5 text-right font-bold text-brandGreen"><?= number_format($row['stock_quantity']) ?></td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
@@ -172,7 +186,7 @@ sort($skuGroups);
                 <h3 class="text-xl font-bold text-slate-900">Import ข้อมูลจาก Google Sheets</h3>
                 <button onclick="closeImportModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
-            
+
             <form action="import_process.php" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <div class="space-y-2">
                     <label class="block text-xs font-semibold text-slate-600">เลือกไฟล์ CSV (ที่ดาวน์โหลดจาก Google Sheets)</label>
@@ -196,14 +210,14 @@ sort($skuGroups);
 
         function filterGroup(group) {
             currentGroup = group;
-            
+
             document.querySelectorAll('.group-tab').forEach(btn => {
                 btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm');
                 btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200');
             });
-            
+
             let activeBtn = document.getElementById('group-' + group);
-            if(activeBtn) {
+            if (activeBtn) {
                 activeBtn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200');
                 activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-sm');
             }
@@ -214,11 +228,11 @@ sort($skuGroups);
         function applyFilters() {
             let searchFilter = document.getElementById('searchSku').value.toLowerCase();
             let rows = document.querySelectorAll('.product-row');
-            
+
             rows.forEach(row => {
                 let rowPrefix = row.getAttribute('data-sku-prefix');
                 let rowText = row.innerText.toLowerCase();
-                
+
                 let matchesGroup = (currentGroup === 'all' || rowPrefix === currentGroup);
                 let matchesSearch = rowText.includes(searchFilter);
 
@@ -236,11 +250,12 @@ sort($skuGroups);
             document.getElementById('importModal').classList.remove('hidden');
             document.getElementById('importModal').classList.add('flex');
         }
+
         function closeImportModal() {
             document.getElementById('importModal').classList.remove('flex');
             document.getElementById('importModal').classList.add('hidden');
         }
-     
     </script>
 </body>
+
 </html>
